@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anchal → Kannur → Coorg</title>
+<style>
+  :root{
+    --ink:#1f231d;
+    --paper:#f6f2e7;
+    --moss:#3d5641;
+    --moss-dark:#27362b;
+    --fern:#7fa873;
+    --clay:#c0593a;
+    --gold:#cfa648;
+    --line:rgba(31,35,29,0.12);
+    --bg:#f6f2e7;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Iowan Old Style','Georgia',serif;
+    overflow-x:hidden;
+    transition:background-color 1s ease;
+  }
+
+  /* TOP PROGRESS + CAR */
+  .progress-track{ position:fixed; top:0; left:0; right:0; height:5px; background:rgba(0,0,0,.06); z-index:50; }
+  .progress{
+    position:absolute; top:0; left:0; height:5px; width:0%;
+    background:linear-gradient(90deg,var(--clay),var(--gold));
+    transition:width .1s linear;
+  }
+  .car-marker{
+    position:fixed; top:-13px; left:0%; font-size:20px; z-index:51;
+    transform:translateX(-50%) scaleX(-1);
+    transition:left .1s linear;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.3));
+  }
+
+  /* HERO */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    background:radial-gradient(circle at 30% 20%, #4a6b4d 0%, var(--moss-dark) 60%, #1d281f 100%);
+    color:var(--paper);
+    position:relative;
+    padding:40px 24px;
+    overflow:hidden;
+  }
+  .hero .contour{ position:absolute; inset:0; opacity:.18; pointer-events:none; }
+  .hero .contour path{
+    stroke-dasharray:8 6;
+    animation:dash 30s linear infinite;
+  }
+  @keyframes dash{ to{ stroke-dashoffset:-1000; } }
+
+  .firefly{
+    position:absolute; width:4px; height:4px; border-radius:50%;
+    background:var(--gold); opacity:0; pointer-events:none;
+    animation:flicker 6s ease-in-out infinite;
+  }
+  @keyframes flicker{
+    0%,100%{ opacity:0; transform:translateY(0) scale(1); }
+    50%{ opacity:.8; transform:translateY(-30px) scale(1.4); }
+  }
+
+  .hero-eyebrow{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    letter-spacing:.25em; text-transform:uppercase; font-size:11px;
+    opacity:0; margin-bottom:18px;
+    animation:riseIn .8s ease forwards;
+    animation-delay:.1s;
+  }
+  .hero h1{
+    font-size:clamp(34px,8vw,56px); line-height:1.08; margin:0 0 22px; font-weight:700;
+  }
+  .hero h1 span.word{
+    display:inline-block; opacity:0; transform:translateY(24px);
+    animation:riseIn .8s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .hero h1 .acc{color:var(--gold);}
+  @keyframes riseIn{ to{ opacity:1; transform:translateY(0); } }
+
+  .hero-route{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; margin-bottom:26px;
+    opacity:0; animation:riseIn .8s ease forwards; animation-delay:1.1s;
+  }
+  .hero-route span{ background:rgba(255,255,255,.1); padding:6px 14px; border-radius:30px; transition:transform .25s ease, background .25s ease; }
+  .hero-route span:not(.a):hover{ background:rgba(255,255,255,.22); transform:translateY(-2px); }
+  .hero-route .a{opacity:.45;}
+
+  .hero-stats{
+    display:flex; gap:30px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; opacity:0;
+    flex-wrap:wrap; justify-content:center;
+    animation:riseIn .8s ease forwards; animation-delay:1.3s;
+  }
+  .hero-stats b{display:block; font-size:20px; font-family:'Iowan Old Style',serif; color:var(--gold);}
+  .scroll-cue{
+    position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; letter-spacing:.15em;
+    text-transform:uppercase; opacity:.6;
+    animation:bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,8px);} }
+
+  /* DAY BANNERS */
+  .day-banner{
+    position:sticky; top:0; z-index:20;
+    padding:16px 24px;
+    color:var(--paper);
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    display:flex; justify-content:space-between; align-items:baseline;
+    transition:background .4s ease;
+  }
+  .day-banner .num{font-size:11px; letter-spacing:.2em; opacity:.7;}
+  .day-banner .label{font-size:15px; font-weight:700; font-family:'Iowan Old Style',serif;}
+  .day1 .day-banner{background:var(--moss-dark);}
+  .day2 .day-banner{background:#5a4226;}
+  .day3 .day-banner{background:#2e4257;}
+
+  .day-section{padding-bottom:10px;}
+  .day-intro{ padding:36px 24px 10px; max-width:640px; margin:0 auto; }
+  .day-intro h2{
+    font-size:clamp(26px,6vw,36px); margin:0 0 6px;
+    opacity:0; transform:translateX(-24px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .day-intro h2.visible{ opacity:1; transform:translateX(0); }
+  .day-intro .meta{ font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; color:#6b6655; }
+
+  /* TIMELINE + CARDS */
+  .stops{ max-width:640px; margin:0 auto; padding:10px 24px 30px; position:relative; }
+  .rail{
+    position:absolute; left:8px; top:14px; bottom:14px; width:2px;
+    background:repeating-linear-gradient(to bottom, var(--line) 0 6px, transparent 6px 12px);
+  }
+  .card{
+    background:#fff;
+    border-radius:18px;
+    padding:20px 22px;
+    margin:18px 0 18px 26px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+    border:1px solid var(--line);
+    opacity:0;
+    transform:translateY(28px) scale(.97);
+    transition:opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1), box-shadow .3s ease, border-color .3s ease;
+    position:relative;
+  }
+  .card::before{
+    content:""; position:absolute; left:-26px; top:24px; width:11px; height:11px;
+    border-radius:50%; background:var(--clay); border:3px solid var(--paper);
+    transform:scale(0); transition:transform .4s cubic-bezier(.34,1.56,.64,1) .15s;
+  }
+  .card.lodging::before{ background:var(--moss); }
+  .card.visible{ opacity:1; transform:translateY(0) scale(1); }
+  .card.visible::before{ transform:scale(1); }
+  .card:hover{
+    box-shadow:0 14px 30px rgba(31,35,29,.12);
+    transform:translateY(-4px) scale(1.01);
+    border-color:rgba(192,89,58,.35);
+  }
+  .card.lodging{ background:linear-gradient(135deg,#eef3ea,#fff); border-color:rgba(61,86,65,.25); }
+  .card .time{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--clay); font-weight:700;
+  }
+  .card.lodging .time{color:var(--moss);}
+  .card h3{ margin:6px 0 6px; font-size:19px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .card p{ margin:0; font-size:14.5px; line-height:1.55; color:#4c4a3f; }
+  .dur{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; font-weight:700;
+    background:var(--moss); color:#fff; padding:3px 10px; border-radius:20px;
+    transition:transform .2s ease;
+  }
+  .card:hover .dur{ transform:scale(1.08); }
+  .card.lodging .dur{ background:var(--clay); }
+  .tags{ margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; }
+  .tag{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:10.5px;
+    background:#eef0e6; color:var(--moss); padding:3px 9px; border-radius:10px;
+  }
+  .tag.cost{background:#f7e6db; color:var(--clay);}
+  .tag.skip{background:#eef2f6; color:#3a5a78;}
+
+  /* CLICKABLE CARD AFFORDANCE */
+  .card{ cursor:pointer; }
+  .card::after{
+    content:"›"; position:absolute; top:18px; right:20px;
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:18px; font-weight:700;
+    color:var(--line); transition:transform .25s ease, color .25s ease;
+  }
+  .card:hover::after{ transform:translateX(3px); color:var(--clay); }
+  .card.lodging:hover::after{ color:var(--moss); }
+
+  /* DETAIL MODAL */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:100;
+    background:rgba(20,22,16,0.55); backdrop-filter:blur(3px);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; visibility:hidden;
+    transition:opacity .3s ease, visibility 0s linear .3s;
+    padding:0;
+  }
+  .modal-overlay.open{ opacity:1; visibility:visible; transition:opacity .3s ease; }
+  @media (min-width:680px){
+    .modal-overlay{ align-items:center; padding:24px; }
+  }
+  .modal-panel{
+    background:var(--paper); width:100%; max-width:520px; max-height:88vh;
+    overflow-y:auto; position:relative;
+    border-radius:24px 24px 0 0;
+    box-shadow:0 -10px 40px rgba(0,0,0,.25);
+    transform:translateY(100%);
+    transition:transform .35s cubic-bezier(.2,.7,.2,1);
+  }
+  .modal-overlay.open .modal-panel{ transform:translateY(0); }
+  @media (min-width:680px){
+    .modal-panel{ border-radius:24px; transform:translateY(24px) scale(.96); box-shadow:0 24px 60px rgba(0,0,0,.3); }
+    .modal-overlay.open .modal-panel{ transform:translateY(0) scale(1); }
+  }
+  .modal-visual{
+    height:170px; position:relative; overflow:hidden;
+    border-radius:24px 24px 0 0;
+    background:linear-gradient(135deg, var(--moss-dark), var(--moss));
+  }
+  .visual-art{ position:absolute; inset:0; width:100%; height:100%; }
+  .visual-art svg{ width:100%; height:100%; display:block; }
+  .visual-art img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .emoji-badge{
+    position:absolute; bottom:14px; left:16px; z-index:2;
+    width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.18); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center;
+    font-size:19px; box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px; z-index:2;
+    width:34px; height:34px; border-radius:50%; border:none;
+    background:rgba(255,255,255,.85); color:var(--ink);
+    font-size:16px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .modal-close:hover{ background:#fff; transform:scale(1.08); }
+  .modal-body{ padding:24px 26px 30px; }
+  .modal-time{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--clay); font-weight:700;
+  }
+  .modal-body h3{ margin:6px 0 14px; font-size:23px; line-height:1.25; }
+  .modal-body p.desc{ margin:0 0 16px; font-size:15px; line-height:1.65; color:#4c4a3f; }
+  .modal-tips{ background:#fdf3da; border:1px solid #ecd9ab; border-radius:14px; padding:14px 16px; margin-bottom:14px; }
+  .modal-tips.empty{ display:none; }
+  .modal-tips .tip-label{
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:10.5px; text-transform:uppercase;
+    letter-spacing:.08em; color:#a3852f; font-weight:700; margin-bottom:6px;
+  }
+  .modal-tips ul{ margin:0; padding-left:18px; font-family:'Helvetica Neue',Arial,sans-serif; font-size:13.5px; line-height:1.6; color:#6b5527; }
+  .modal-tips li{ margin-bottom:4px; }
+  .modal-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  body.modal-open{ overflow:hidden; }
+
+  .note{ max-width:640px; margin:6px auto 0; padding:0 24px; }
+  .note .box{
+    background:#fdf3da; border:1px solid #ecd9ab; border-radius:14px;
+    padding:14px 16px; font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px; line-height:1.55; color:#6b5527;
+    opacity:0; transform:translateY(20px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .note .box.visible{ opacity:1; transform:translateY(0); }
+
+  .divider{ height:70px; background:linear-gradient(180deg, transparent, rgba(0,0,0,0.03)); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .divider svg{ width:120px; opacity:.4; }
+  .divider .pathline{ stroke-dasharray:6 5; animation:dash2 4s linear infinite; }
+  @keyframes dash2{ to{ stroke-dashoffset:-200; } }
+
+  .checklist-wrap{ background:var(--moss-dark); color:var(--paper); padding:50px 24px 60px; }
+  .checklist{ max-width:560px; margin:0 auto; }
+  .checklist h2{ font-size:24px; margin:0 0 6px; }
+  .checklist .sub{ font-family:'Helvetica Neue',Arial,sans-serif; font-size:13px; opacity:.7; margin-bottom:22px; }
+  .checklist label{
+    display:flex; align-items:flex-start; gap:10px;
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:14.5px;
+    padding:11px 0; border-bottom:1px solid rgba(255,255,255,.12);
+    cursor:pointer;
+    transition:padding-left .2s ease;
+  }
+  .checklist label:hover{ padding-left:6px; }
+  .checklist input{ margin-top:3px; width:16px; height:16px; accent-color:var(--gold); }
+  .checklist input:checked + span{ text-decoration:line-through; opacity:.5; }
+
+  footer{
+    text-align:center; padding:26px 24px 40px;
+    font-family:'Helvetica Neue',Arial,sans-serif; font-size:11.5px;
+    color:#8a8470; background:var(--paper);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card, .note .box, .day-intro h2, .hero *{ transition:none !important; animation:none !important; opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-track"><div class="progress" id="progress"></div></div>
+<div class="car-marker" id="carMarker">🚗</div>
+
+<section class="hero">
+  <svg class="contour" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,500 Q200,420 400,500 T800,480" stroke="white" fill="none" stroke-width="2"/>
+    <path d="M0,560 Q220,470 420,560 T800,540" stroke="white" fill="none" stroke-width="2"/>
+    <path d="M0,620 Q240,520 440,620 T800,600" stroke="white" fill="none" stroke-width="2"/>
+  </svg>
+  <div id="fireflyHost"></div>
+  <p class="hero-eyebrow">Family Road Trip · 3 Days</p>
+  <h1><span class="word" style="animation-delay:.2s">Anchal</span> <span class="word" style="animation-delay:.3s">to</span> <span class="word acc" style="animation-delay:.4s">Coorg</span><br><span class="word" style="animation-delay:.5s">the</span> <span class="word" style="animation-delay:.6s">long</span> <span class="word" style="animation-delay:.7s">way</span><br><span class="word" style="animation-delay:.8s">through</span> <span class="word" style="animation-delay:.9s">the</span> <span class="word" style="animation-delay:1.0s">hills</span></h1>
+  <div class="hero-route">
+    <span>Anchal</span><span class="a">→</span>
+    <span>Kannur</span><span class="a">→</span>
+    <span>Madikeri</span><span class="a">→</span>
+    <span>Anchal</span>
+  </div>
+  <div class="hero-stats">
+    <div><b>Tue–Fri</b>overnight return</div>
+    <div><b>~900 km</b>round trip</div>
+    <div><b>2</b>nights away</div>
+  </div>
+  <div class="scroll-cue">Scroll to begin ↓</div>
+</section>
+
+<!-- DAY 1 -->
+<section class="day1 day-section">
+  <div class="day-banner"><span class="num">23RD · TUE NIGHT</span><span class="label">Anchal → Kannur</span></div>
+  <div class="day-intro">
+    <h2>Into the night, up the coast</h2>
+    <div class="meta">~300 km · NH66 north · arrive past midnight</div>
+  </div>
+  <div class="stops">
+    <div class="rail"></div>
+    <div class="card" data-place="depart-anchal">
+      <div class="time">7:00 – 8:00 PM</div>
+      <h3>Depart Anchal, Kollam</h3>
+      <p>Start the drive north along the coast on NH66. Stop for dinner en route — figure 6–7 hrs total with breaks.</p>
+    </div>
+    <div class="card lodging" data-place="stay-kannur">
+      <div class="time">Arrive ~2–3 AM</div>
+      <h3>Overnight — Beach Residency, Kannur <span class="dur">Sleep</span></h3>
+      <p>Budget, clean, ~1 km from Payyambalam Beach and close to the railway station.</p>
+      <div class="tags"><span class="tag cost">~₹600/night</span><span class="tag">Budget pick</span></div>
+    </div>
+  </div>
+  <div class="note"><div class="box">🌙 <b>Note:</b> You'll arrive late, so plan to wake by 8 AM — there's a full sightseeing morning ahead before the drive to Coorg.</div></div>
+</section>
+
+<div class="divider"><svg viewBox="0 0 100 20"><path class="pathline" d="M0,10 Q25,0 50,10 T100,10" stroke="#3d5641" fill="none" stroke-width="2"/></svg></div>
+
+<!-- DAY 2 -->
+<section class="day2 day-section">
+  <div class="day-banner"><span class="num">24TH · WED</span><span class="label">Kannur sights → Coorg</span></div>
+  <div class="day-intro">
+    <h2>A morning in Kannur, then up to the hills</h2>
+    <div class="meta">Kannur sightseeing 8:30 AM–12 PM · then ~115 km drive to Madikeri</div>
+  </div>
+  <div class="stops">
+    <div class="rail"></div>
+    <div class="card" data-place="fort">
+      <div class="time">8:30 – 9:30 AM</div>
+      <h3>St. Angelo Fort <span class="dur">1 hr</span></h3>
+      <p>1505 Portuguese fort with laterite walls, cannons, and sweeping Arabian Sea views. Easy walk, good for the whole family.</p>
+      <div class="tags"><span class="tag cost">₹25 entry</span></div>
+    </div>
+    <div class="card" data-place="mappila-bay">
+      <div class="time">9:35 – 10:00 AM</div>
+      <h3>Mappila Bay <span class="dur">25 min</span></h3>
+      <p>Fishing harbour right next to the fort — boats, nets, and a nice sea breeze. Quick stop, drive right up to it.</p>
+      <div class="tags"><span class="tag cost">₹40 for car entry</span></div>
+    </div>
+    <div class="card" data-place="payyambalam">
+      <div class="time">10:15 – 11:00 AM</div>
+      <h3>Payyambalam Beach & Park <span class="dur">45 min</span></h3>
+      <p>Kannur's main beach with a walkable promenade and sculpture park. Good for a relaxed stroll before the long drive.</p>
+      <div class="tags"><span class="tag cost">₹20 park entry</span></div>
+    </div>
+    <div class="card" data-place="lunch-kannur">
+      <div class="time">11:00 AM – 12:00 PM</div>
+      <h3>Lunch in Kannur <span class="dur">1 hr</span></h3>
+      <p>Eat a proper meal before setting off — next solid food stop will likely be on the road.</p>
+    </div>
+    <div class="card" data-place="depart-kannur">
+      <div class="time">12:15 PM</div>
+      <h3>Depart Kannur → Madikeri</h3>
+      <p>3–3.5 hrs via NH75 through the Western Ghats. Hairpin bends — better to drive this stretch in daylight.</p>
+    </div>
+    <div class="card" data-place="abbi-falls">
+      <div class="time">~3:00 – 3:45 PM</div>
+      <h3>Abbi Waterfall <span class="dur">45 min</span></h3>
+      <p>70-ft falls reached by a short walk through coffee plantations, right on the way into Madikeri.</p>
+      <div class="tags"><span class="tag cost">₹30 entry</span></div>
+    </div>
+    <div class="card" data-place="rajas-seat">
+      <div class="time">5:30 – 6:30 PM</div>
+      <h3>Raja's Seat — sunset <span class="dur">1 hr</span></h3>
+      <p>Madikeri's iconic viewpoint over the valley. Garden, play area, ziplining if the kids want activity time. Arrive before sunset, it fills up fast.</p>
+      <div class="tags"><span class="tag">Don't miss</span></div>
+    </div>
+    <div class="card lodging" data-place="stay-madikeri">
+      <div class="time">Evening</div>
+      <h3>Overnight in Madikeri <span class="dur">Sleep</span></h3>
+      <p>Plenty of resorts/homestays in town — happy to shortlist specific names if you want.</p>
+    </div>
+  </div>
+  <div class="note"><div class="box">⏱ <b>Buffer:</b> Kannur sightseeing block has light spacing built in for traffic/parking. If you finish early, you can linger at the beach instead of rushing to Coorg.</div></div>
+</section>
+
+<div class="divider"><svg viewBox="0 0 100 20"><path class="pathline" d="M0,10 Q25,0 50,10 T100,10" stroke="#5a4226" fill="none" stroke-width="2"/></svg></div>
+
+<!-- DAY 3 -->
+<section class="day3 day-section">
+  <div class="day-banner"><span class="num">25TH · THU</span><span class="label">Coorg → drive home overnight</span></div>
+  <div class="day-intro">
+    <h2>A full day in Coorg, then the long drive back</h2>
+    <div class="meta">Sightseeing 8 AM–6 PM · depart by 9–10 PM · reach Anchal ~5–6 AM Fri</div>
+  </div>
+  <div class="stops">
+    <div class="rail"></div>
+    <div class="card" data-place="mandalpatti">
+      <div class="time">6:00 – 7:30 AM</div>
+      <h3>Mandalpatti viewpoint <span class="dur">1.5 hr</span></h3>
+      <p>Jeep-only road, best misty sunrise views in Coorg. Only for early risers — needs a 6 AM start and a 4x4/jeep hire at the base.</p>
+      <div class="tags"><span class="tag skip">Optional, early start</span></div>
+    </div>
+    <div class="card" data-place="coffee-plantation">
+      <div class="time">9:00 – 10:00 AM</div>
+      <h3>Mountain View Coffee Plantation <span class="dur">1 hr</span></h3>
+      <p>Guided walk through coffee & spice plants, ends with coffee/wine tasting.</p>
+      <div class="tags"><span class="tag cost">~₹200/person</span></div>
+    </div>
+    <div class="card" data-place="omkareshwar">
+      <div class="time">10:30 – 11:00 AM</div>
+      <h3>Sri Omkareshwar Temple <span class="dur">30 min</span></h3>
+      <p>1820s Shiva temple with an unusual Indo-Saracenic dome-and-minaret look, calm pond out front.</p>
+    </div>
+    <div class="card" data-place="dubare">
+      <div class="time">12:30 – 2:30 PM</div>
+      <h3>Dubare Elephant Camp <span class="dur">2 hr</span></h3>
+      <p>~40 min from Madikeri. Watch or join elephant bathing/feeding sessions with a naturalist guide — a highlight for kids.</p>
+      <div class="tags"><span class="tag cost">Entry + activity fees vary</span></div>
+    </div>
+    <div class="card" data-place="namdroling">
+      <div class="time">3:15 – 4:15 PM</div>
+      <h3>Namdroling Golden Temple, Bylakuppe <span class="dur">1 hr</span></h3>
+      <p>Tibetan Buddhist monastery with a massive golden Buddha statue and vivid architecture — calm and visually stunning, ~1 hr from Dubare.</p>
+    </div>
+    <div class="card" data-place="dinner-madikeri">
+      <div class="time">5:00 – 6:00 PM</div>
+      <h3>Dinner in Madikeri <span class="dur">1 hr</span></h3>
+      <p>Early dinner before the long overnight drive — last proper sit-down meal before the road.</p>
+    </div>
+    <div class="card" data-place="depart-coorg">
+      <div class="time">9:00 – 10:00 PM</div>
+      <h3>Depart Coorg → Anchal</h3>
+      <p>~430–450 km via Kozhikode and NH66 south. Driving overnight means no daytime traffic, but plan driver swaps/rest stops every 2 hrs.</p>
+    </div>
+    <div class="card" data-place="arrive-anchal">
+      <div class="time">~5:00 – 6:00 AM (Fri)</div>
+      <h3>Arrive Anchal</h3>
+      <p>End of the trip — a quiet early morning roll back home.</p>
+    </div>
+  </div>
+  <div class="note"><div class="box">🛣 <b>Overnight drive note:</b> the Madikeri ghat descent should ideally be done before full dark if possible — leaving by 8:30–9 PM gives a buffer. Keep the driver fresh with a coffee stop in Kozhikode around midnight.</div></div>
+</section>
+
+<div class="checklist-wrap">
+  <div class="checklist">
+    <h2>Quick checklist</h2>
+    <div class="sub">Tick these off before you leave</div>
+    <label><input type="checkbox"><span>Fuel up + check tyres before leaving Anchal</span></label>
+    <label><input type="checkbox"><span>Book Kannur stay in advance</span></label>
+    <label><input type="checkbox"><span>Book Madikeri stay in advance</span></label>
+    <label><input type="checkbox"><span>Cash for fort/falls/plantation/temple entries</span></label>
+    <label><input type="checkbox"><span>Warm layer for Coorg evenings + Mandalpatti morning</span></label>
+    <label><input type="checkbox"><span>Driver rest stops planned for the overnight return</span></label>
+  </div>
+</div>
+
+<footer>Made for the family WhatsApp group · scroll back up anytime ↑</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-panel">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div class="modal-visual" id="modalVisual">
+      <div class="visual-art" id="visualArt"></div>
+      <span class="emoji-badge" id="modalEmoji">🏰</span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-time" id="modalTime"></div>
+      <h3 id="modalTitle"></h3>
+      <p class="desc" id="modalDesc"></p>
+      <div class="modal-tips" id="modalTips">
+        <div class="tip-label">Good to know</div>
+        <ul id="modalTipsList"></ul>
+      </div>
+      <div class="modal-tags" id="modalTags"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const placeData = {
+    "depart-anchal": { visual:"road", emoji:"🚗", desc:"The trip starts here — fuel up, do a quick tyre and light check, and get on NH66 heading north along the Kerala coast. The first stretch runs through Kollam and Kozhikode before the road narrows near the Kannur border.", tips:["Top up fuel before leaving — fewer pumps stay open late at night on this stretch.","Pack a thermos of coffee for the night drivers."] },
+    "stay-kannur": { visual:"lodging", emoji:"🛏️", desc:"A simple budget stay close to Payyambalam Beach, useful as a base since you'll be arriving in the middle of the night. Walking distance to the railway station if anyone needs to head out separately.", tips:["Call ahead to confirm late check-in — you'll likely arrive past 2 AM.","Ask for rooms on the upper floor, away from the main road noise."] },
+    "fort": { visual:"fort", emoji:"🏰", desc:"Built by the Portuguese in 1505 and later held by the Dutch and British, this laterite-stone fort sits right on the Arabian Sea coast. Triangular bastions, an old chapel, and a few cannons make for an easy half-hour wander, with views over Mappila Bay from the ramparts.", tips:["Wear shoes with grip — the laterite stone gets slippery near the ramparts.","Mid-morning light works best for photos, before the sun is directly overhead."] },
+    "mappila-bay": { visual:"harbour", emoji:"⚓", desc:"A working fishing harbour right beside the fort, full of boats, nets drying in the sun, and the everyday rhythm of a coastal town. You can drive right up to the water's edge.", tips:["20–25 minutes is plenty — pair it with the fort visit."] },
+    "payyambalam": { visual:"beach", emoji:"🏖️", desc:"Kannur's main town beach, with a long paved promenade, a sculpture park, and enough open space for kids to run around before a long day of driving. Calmer than a swimming beach — more of a stroll-and-breathe stop.", tips:["Carry water — the promenade has limited shade by late morning."] },
+    "lunch-kannur": { visual:"meal", emoji:"🍽️", desc:"A sit-down meal before the long Western Ghats drive. Kannur is known for Malabar biryani and fresh seafood, so it's worth seeking out a proper Kerala-style thali or biryani spot near the beach road rather than rushing a quick bite.", tips:[] },
+    "depart-kannur": { visual:"road", emoji:"🚗", desc:"The drive from Kannur to Madikeri climbs steadily on NH75 into the Western Ghats, with hairpin bends increasing through the final stretch before town. It's scenic, but noticeably slower than the highway portion earlier in the trip.", tips:["Top up fuel before the ghat section — stations thin out.","If anyone gets carsick on hairpins, front seats and a light meal beforehand help."] },
+    "abbi-falls": { visual:"waterfall", emoji:"💧", desc:"A roughly 70-foot waterfall reached by a short walk through private coffee and cardamom plantations, conveniently right on the way into Madikeri. A viewing bridge faces the falls directly, though swimming isn't allowed.", tips:["Steps can be mossy and slippery after rain — good footwear helps."] },
+    "rajas-seat": { visual:"sunset", emoji:"🌅", desc:"Madikeri's signature viewpoint, traditionally where local kings would watch the sunset over the valley. There's a landscaped garden, a toy train, and a small play area for kids, and on clear evenings the hills layer into the distance in shades of blue.", tips:["Arrive 30–40 minutes before sunset — both the viewpoint and parking fill up fast.","Ziplining and a musical fountain run some evenings if the kids want extra activity."] },
+    "stay-madikeri": { visual:"lodging", emoji:"🛏️", desc:"Madikeri has a wide range of homestays and resorts, many run by local coffee-growing families and set right inside plantation land just outside town.", tips:["Plantation-stay homestays tend to be quieter and cooler than in-town hotels — worth it if you don't mind a short drive each morning."] },
+    "mandalpatti": { visual:"mist", emoji:"🌄", desc:"An open grassland viewpoint above Madikeri, reachable only by jeep on a rough, narrow track — regular cars aren't allowed past the base. Mist tends to roll through at sunrise, which is when it's most photogenic, but it's an optional early-start detour.", tips:["Jeeps are hired at the base village — agree on the fare before setting off.","Carry a light jacket; it's noticeably cooler and windier up top."] },
+    "coffee-plantation": { visual:"coffee", emoji:"☕", desc:"A guided walk through coffee bushes interplanted with pepper vines and cardamom — Coorg's classic shade-grown plantation style. Most tours end with a tasting of filter coffee, and sometimes a small sample of homemade wine.", tips:["Ask the guide to point out the pepper vines climbing the silver oak trees — easy to miss otherwise."] },
+    "omkareshwar": { visual:"temple", emoji:"🛕", desc:"A 19th-century Shiva temple in central Madikeri with an unusual Indo-Saracenic look — a central dome flanked by minaret-style towers, unlike typical Kerala or Karnataka temple architecture. A calm temple tank with fish sits right in front.", tips:["Modest dress is appreciated — it's an active place of worship."] },
+    "dubare": { visual:"elephant", emoji:"🐘", desc:"A forest camp on the banks of the Cauvery river where captive elephants used for forest department work are bathed and fed each morning. Visitors can watch from the riverbank, and some packages let you join in the bathing under a mahout's supervision.", tips:["Activity slots can be limited on weekends — arriving close to opening helps.","Carry a change of clothes if the kids want to join the bathing session."] },
+    "namdroling": { visual:"golden", emoji:"🪔", desc:"One of the largest Tibetan Buddhist settlements outside Tibet, built after refugees were resettled here in the 1960s. The main hall houses a giant golden Buddha statue flanked by two more large figures, with walls covered in detailed murals.", tips:["Keep voices low and phones on silent — it's an active monastery, not just a sightseeing stop.","The attached market sells Tibetan snacks and momos if anyone wants a quick bite."] },
+    "dinner-madikeri": { visual:"meal", emoji:"🍽️", desc:"An early sit-down dinner before the long overnight drive home. Coorg's Kodava cuisine is worth trying here if you haven't already — pandi curry (pork) or mushroom curry with akki roti are local favourites.", tips:[] },
+    "depart-coorg": { visual:"road", emoji:"🌙", desc:"The return leg runs back down through Kozhikode and onto NH66 south. Driving overnight avoids daytime traffic through the Kerala coastal towns, but it's a long stretch — plan for the driver to be swapped every couple of hours.", tips:["Schedule a proper break in Kozhikode around midnight — strong coffee and a 20-minute stretch makes a real difference on a night drive."] },
+    "arrive-anchal": { visual:"home", emoji:"🏡", desc:"The trip wraps up with a quiet early-morning roll back into Anchal — likely the only traffic on the road at that hour. A good excuse for everyone to sleep in once you're home.", tips:[] }
+  };
+
+  const dayAccent = {
+    day1: "linear-gradient(135deg, #2f4233, var(--moss-dark))",
+    day2: "linear-gradient(135deg, #6b4f30, #5a4226)",
+    day3: "linear-gradient(135deg, #3a5570, #2e4257)"
+  };
+
+  const L = 'stroke="rgba(255,255,255,0.85)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  const F = 'fill="rgba(255,255,255,0.14)"';
+  const visualArt = {
+    road: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-10,120 Q90,70 190,120 T410,110" ${F}/>
+      <path d="M-10,150 Q100,100 210,150 T410,140" ${L} opacity="0.5"/>
+      <path d="M40,170 L160,40 L280,170 Z" ${F} opacity="0.6"/>
+      <path d="M150,170 Q200,90 250,170" ${L}/>
+      <path d="M195,150 L205,150 M190,130 L210,130 M185,108 L215,108" stroke="rgba(255,255,255,0.6)" stroke-width="4" stroke-dasharray="2 8" stroke-linecap="round"/>
+      <rect x="178" y="118" width="44" height="22" rx="6" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <circle cx="190" cy="142" r="6" fill="rgba(255,255,255,0.85)"/>
+      <circle cx="212" cy="142" r="6" fill="rgba(255,255,255,0.85)"/>
+      <path d="M182,118 L188,104 L210,104 L216,118 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+    </svg>`,
+    lodging: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="320" cy="45" r="26" fill="rgba(255,255,255,0.18)"/>
+      <circle cx="312" cy="38" r="26" fill="rgba(255,255,255,0)" style="mix-blend-mode:multiply"/>
+      <circle cx="60" cy="40" r="2.5" fill="rgba(255,255,255,0.6)"/>
+      <circle cx="100" cy="60" r="2" fill="rgba(255,255,255,0.5)"/>
+      <circle cx="150" cy="30" r="2.5" fill="rgba(255,255,255,0.6)"/>
+      <path d="M110,170 L110,95 L170,55 L230,95 L230,170 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M95,100 L170,50 L245,100" ${L}/>
+      <rect x="150" y="120" width="40" height="50" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <line x1="170" y1="120" x2="170" y2="170" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+      <circle cx="178" cy="145" r="3" fill="rgba(255,255,255,0.7)"/>
+    </svg>`,
+    fort: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-10,140 Q120,118 250,140 T410,135" ${L} opacity="0.5"/>
+      <path d="M-10,155 Q130,135 260,155 T410,150" ${L} opacity="0.3"/>
+      <path d="M120,170 L120,90 L280,90 L280,170 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M120,90 L120,75 L135,75 L135,90 M155,90 L155,72 L172,72 L172,90 M188,90 L188,75 L205,75 L205,90 M222,90 L222,72 L239,72 L239,90 M258,90 L258,75 L280,75 L280,90" ${L}/>
+      <rect x="188" y="120" width="24" height="50" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <line x1="100" y1="72" x2="100" y2="115" stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M100,72 L130,80 L100,88 Z" fill="rgba(255,255,255,0.7)"/>
+    </svg>`,
+    harbour: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-10,120 Q60,108 120,120 T250,118 T410,122" ${L}/>
+      <path d="M-10,138 Q70,124 140,138 T270,134 T410,140" ${L} opacity="0.6"/>
+      <path d="M150,118 L130,150 L260,150 L245,118 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <line x1="195" y1="118" x2="195" y2="55" stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M195,58 Q225,70 195,100" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <path d="M195,58 Q170,75 195,105" ${F} stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+    </svg>`,
+    beach: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="320" cy="55" r="28" fill="rgba(255,255,255,0.22)"/>
+      <path d="M-10,125 Q90,108 190,125 T410,120" ${L}/>
+      <path d="M-10,142 Q100,122 210,142 T410,136" ${L} opacity="0.6"/>
+      <path d="M-10,158 Q110,140 230,158 T410,150" ${L} opacity="0.35"/>
+      <path d="M90,170 Q90,90 60,60" ${L}/>
+      <path d="M90,100 Q60,90 40,100 Q60,112 90,100" ${F}/>
+      <path d="M90,90 Q120,82 138,92 Q118,102 90,90" ${F}/>
+      <path d="M90,80 Q70,62 78,42 Q102,58 90,80" ${F}/>
+    </svg>`,
+    meal: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="200" cy="120" rx="70" ry="26" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <ellipse cx="200" cy="116" rx="46" ry="16" stroke="rgba(255,255,255,0.5)" stroke-width="2" fill="none"/>
+      <path d="M150,95 Q146,75 152,58 M158,95 Q156,75 160,58 M166,95 Q168,75 168,58" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M250,95 Q254,75 248,58 M258,95 Q262,75 256,58" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`,
+    waterfall: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M130,75 L150,30 L250,30 L270,75 Z" ${F} stroke="rgba(255,255,255,0.6)" stroke-width="2.5"/>
+      <path d="M180,40 Q186,90 180,140 M200,40 Q204,90 200,140 M220,40 Q216,90 220,140" stroke="rgba(255,255,255,0.85)" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="3 7"/>
+      <path d="M140,150 Q200,168 260,150 Q200,158 140,150" ${F} stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+      <path d="M-10,160 Q90,150 190,160 T410,155" ${L} opacity="0.35"/>
+    </svg>`,
+    sunset: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="100" r="34" fill="rgba(255,255,255,0.22)"/>
+      <line x1="200" y1="40" x2="200" y2="55" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="150" y1="55" x2="160" y2="65" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="250" y1="55" x2="240" y2="65" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M-10,140 Q90,110 190,140 T410,130 L410,170 L-10,170 Z" ${F} stroke="rgba(255,255,255,0.6)" stroke-width="2.5"/>
+      <path d="M-10,158 Q120,130 250,158 T410,150 L410,170 L-10,170 Z" fill="rgba(255,255,255,0.22)"/>
+    </svg>`,
+    mist: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M80,170 L190,55 L300,170 Z" ${F} stroke="rgba(255,255,255,0.8)" stroke-width="3"/>
+      <path d="M150,90 L190,55 L230,90 L195,80 Z" fill="rgba(255,255,255,0.35)"/>
+      <path d="M-10,95 Q90,82 190,98 T410,90" stroke="rgba(255,255,255,0.75)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M-10,118 Q100,105 200,120 T410,112" stroke="rgba(255,255,255,0.5)" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </svg>`,
+    coffee: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M165,90 Q160,130 175,150 Q200,162 225,150 Q240,130 235,90 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M235,105 Q255,108 255,122 Q255,136 235,135" ${L}/>
+      <path d="M185,75 Q175,60 185,45 M200,78 Q195,58 210,42 M215,75 Q225,58 218,42" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="120" cy="130" r="7" ${F} stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+      <circle cx="100" cy="148" r="7" ${F} stroke="rgba(255,255,255,0.7)" stroke-width="2"/>
+    </svg>`,
+    temple: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-10,150 Q190,135 410,148" ${L} opacity="0.4"/>
+      <rect x="150" y="100" width="100" height="55" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M150,100 A50,40 0 0 1 250,100 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <line x1="200" y1="60" x2="200" y2="40" stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <circle cx="200" cy="35" r="5" fill="rgba(255,255,255,0.7)"/>
+      <rect x="118" y="118" width="20" height="37" ${F} stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>
+      <rect x="262" y="118" width="20" height="37" ${F} stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>
+      <line x1="128" y1="118" x2="128" y2="95" stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>
+      <line x1="272" y1="118" x2="272" y2="95" stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>
+    </svg>`,
+    elephant: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M-10,150 Q90,138 190,150 T410,144" ${L}/>
+      <path d="M-10,162 Q100,150 210,162 T410,156" ${L} opacity="0.5"/>
+      <path d="M150,150 Q140,100 175,90 Q220,80 245,105 Q260,120 250,150 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M150,150 Q120,150 110,130 Q105,110 122,98" ${L}/>
+      <circle cx="240" cy="100" r="4" fill="rgba(255,255,255,0.8)"/>
+      <path d="M205,90 Q198,75 208,68" ${L}/>
+      <line x1="165" y1="150" x2="165" y2="168" stroke="rgba(255,255,255,0.85)" stroke-width="6" stroke-linecap="round"/>
+      <line x1="195" y1="152" x2="195" y2="168" stroke="rgba(255,255,255,0.85)" stroke-width="6" stroke-linecap="round"/>
+      <line x1="225" y1="152" x2="225" y2="168" stroke="rgba(255,255,255,0.85)" stroke-width="6" stroke-linecap="round"/>
+    </svg>`,
+    golden: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M140,100 L260,100 L245,80 L155,80 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <path d="M155,80 L245,80 L233,62 L167,62 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <path d="M167,62 L233,62 L222,46 L178,46 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <line x1="200" y1="46" x2="200" y2="30" stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <circle cx="200" cy="25" r="4" fill="rgba(255,255,255,0.75)"/>
+      <path d="M170,100 Q170,140 200,148 Q230,140 230,100 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <circle cx="200" cy="118" r="9" stroke="rgba(255,255,255,0.7)" stroke-width="2" fill="none"/>
+    </svg>`,
+    home: `<svg viewBox="0 0 400 170" xmlns="http://www.w3.org/2000/svg">
+      <path d="M280,140 A80,80 0 0 0 130,140" fill="rgba(255,255,255,0.18)"/>
+      <line x1="205" y1="50" x2="205" y2="35" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="160" y1="65" x2="150" y2="55" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="250" y1="65" x2="260" y2="55" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M120,170 L120,110 L200,65 L280,110 L280,170 Z" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="3"/>
+      <path d="M105,115 L200,60 L295,115" ${L}/>
+      <rect x="185" y="130" width="30" height="40" ${F} stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+      <rect x="135" y="125" width="22" height="20" ${F} stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+    </svg>`
+  };
+
+  const placePhotos = {
+    "fort": "images/fort.jpg",
+    "mappila-bay": "images/mappila-bay.jpg",
+    "payyambalam": "images/payyambalam.jpg",
+    "abbi-falls": "images/abbi-falls.jpg",
+    "rajas-seat": "images/rajas-seat.jpg",
+    "stay-kannur": "images/stay-kannur.jpg",
+    "mandalpatti": "images/mandalpatti.jpg",
+    "coffee-plantation": "images/coffee-plantation.jpg",
+    "omkareshwar": "images/omkareshwar.jpg",
+    "dubare": "images/dubare.jpg"
+  };
+
+  function setVisual(place, fallbackSvg){
+    if(placePhotos[place]){
+      const img = new Image();
+      img.onload = () => {
+        visualArtHost.innerHTML = '';
+        visualArtHost.appendChild(img);
+      };
+      img.onerror = () => {
+        visualArtHost.innerHTML = fallbackSvg || '';
+      };
+      img.src = placePhotos[place];
+      img.alt = '';
+      visualArtHost.innerHTML = fallbackSvg || '';
+    } else {
+      visualArtHost.innerHTML = fallbackSvg || '';
+    }
+  }
+  const modalEmoji = document.getElementById('modalEmoji');
+  const modalVisual = document.getElementById('modalVisual');
+  const visualArtHost = document.getElementById('visualArt');
+  const modalTime = document.getElementById('modalTime');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc = document.getElementById('modalDesc');
+  const modalTips = document.getElementById('modalTips');
+  const modalTipsList = document.getElementById('modalTipsList');
+  const modalTags = document.getElementById('modalTags');
+
+  function openModal(card){
+    const place = card.getAttribute('data-place');
+    const data = placeData[place];
+    if(!data) return;
+
+    const daySection = card.closest('.day-section');
+    const dayClass = daySection ? [...daySection.classList].find(c => dayAccent[c]) : null;
+    modalVisual.style.background = dayClass ? dayAccent[dayClass] : dayAccent.day1;
+    visualArtHost.innerHTML = visualArt[data.visual] || '';
+    setVisual(place, visualArt[data.visual]);
+    modalEmoji.textContent = data.emoji;
+
+    modalTime.textContent = card.querySelector('.time') ? card.querySelector('.time').textContent : '';
+    const titleClone = card.querySelector('h3').cloneNode(true);
+    const durBadge = titleClone.querySelector('.dur');
+    if(durBadge) durBadge.remove();
+    modalTitle.textContent = titleClone.textContent.trim();
+    modalDesc.textContent = data.desc;
+
+    modalTipsList.innerHTML = '';
+    if(data.tips && data.tips.length){
+      modalTips.classList.remove('empty');
+      data.tips.forEach(t=>{
+        const li = document.createElement('li');
+        li.textContent = t;
+        modalTipsList.appendChild(li);
+      });
+    } else {
+      modalTips.classList.add('empty');
+    }
+
+    const sourceTags = card.querySelector('.tags');
+    modalTags.innerHTML = sourceTags ? sourceTags.innerHTML : '';
+
+    overlay.classList.add('open');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModal(){
+    overlay.classList.remove('open');
+    document.body.classList.remove('modal-open');
+  }
+
+  document.querySelectorAll('.card[data-place]').forEach(card=>{
+    card.addEventListener('click', ()=> openModal(card));
+  });
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+</script>
+
+<script>
+  const progress = document.getElementById('progress');
+  const car = document.getElementById('carMarker');
+  function updateProgress(){
+    const h = document.documentElement;
+    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progress.style.width = pct + '%';
+    car.style.left = pct + '%';
+  }
+  document.addEventListener('scroll', updateProgress);
+  updateProgress();
+
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.card, .note .box, .day-intro h2').forEach(el=>observer.observe(el));
+
+  // fireflies in hero
+  const host = document.getElementById('fireflyHost');
+  for(let i=0;i<18;i++){
+    const f = document.createElement('div');
+    f.className = 'firefly';
+    f.style.left = (Math.random()*100) + '%';
+    f.style.top = (40 + Math.random()*50) + '%';
+    f.style.animationDelay = (Math.random()*6) + 's';
+    f.style.animationDuration = (4 + Math.random()*4) + 's';
+    host.appendChild(f);
+  }
+
+  // subtle page background shift per day section
+  const bgMap = { day1:'#f6f2e7', day2:'#f7f0e4', day3:'#eef1ec' };
+  const sections = document.querySelectorAll('.day-section');
+  const bgObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const cls = [...e.target.classList].find(c=>bgMap[c]);
+        if(cls){ document.body.style.backgroundColor = bgMap[cls]; }
+      }
+    });
+  }, { threshold:0.4 });
+  sections.forEach(s=>bgObserver.observe(s));
+</script>
+</body>
+</html>
